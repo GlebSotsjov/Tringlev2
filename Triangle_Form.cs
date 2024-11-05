@@ -8,7 +8,7 @@ namespace Tringle
     {
         private Triangle triangle;
 
-        // Конструктор формы, принимающий объект треугольника
+        
         public TriangleForm(Triangle triangle)
         {
             
@@ -18,7 +18,7 @@ namespace Tringle
 
         private void DisplayTriangleInfo()
         {
-            // Метки для отображения информации о треугольнике
+            
             Label labelA = new Label { Text = "Side A: " + triangle.OutputA(), Location = new Point(10, 10) };
             Label labelB = new Label { Text = "Side B: " + triangle.OutputB(), Location = new Point(10, 40) };
             Label labelC = new Label { Text = "Side C: " + triangle.OutputC(), Location = new Point(10, 70) };
@@ -30,7 +30,7 @@ namespace Tringle
                 Location = new Point(10, 160)
             };
 
-            // Добавляем метки на форму
+            
             Controls.Add(labelA);
             Controls.Add(labelB);
             Controls.Add(labelC);

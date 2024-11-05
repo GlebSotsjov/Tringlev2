@@ -1,45 +1,209 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Tringle
 {
     public partial class Tringle_Vorm : Form
     {
+        private Triangle triangle;
+        private PictureBox trianglePictureBox;
+
         public Tringle_Vorm()
         {
             InitializeComponent();
             InitializeCustomComponents();
+            Side();
+
+            triangle = new Triangle(3, 4, 5);
+            DisplayTriangleInfo();
         }
 
         private void InitializeCustomComponents()
         {
-            // Создаем кнопку Start
-            Button startButton = new Button();
-            startButton.Text = "Start";
-            startButton.Font = new Font("Arial", 28, FontStyle.Regular);
-            startButton.Size = new Size(150, 80);
-            startButton.BackColor = Color.Pink;
-            startButton.ForeColor = Color.White;
-            startButton.FlatStyle = FlatStyle.Flat;
-            startButton.FlatAppearance.BorderColor = Color.Black;
-            startButton.Location = new Point(50, 50);
-
-            // Добавляем обработчик события для кнопки
+            // Button setup
+            Button startButton = new Button
+            {
+                Text = "Start",
+                Font = new Font("Arial", 28, FontStyle.Regular),
+                Size = new Size(150, 80),
+                BackColor = Color.Pink,
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Location = new Point(550, 50)
+            };
             startButton.Click += StartButton_Click;
-
-            // Добавляем кнопку на форму
             Controls.Add(startButton);
+
+            // Adding a PictureBox for displaying triangle images
+            trianglePictureBox = new PictureBox
+            {
+                Size = new Size(200, 200),
+                Location = new Point(450, 270),
+                SizeMode = PictureBoxSizeMode.StretchImage
+            };
+            Controls.Add(trianglePictureBox);
         }
 
-        private void StartButton_Click(object sender, EventArgs e)
+        private void DisplayTriangleInfo()
         {
-            // Создаем экземпляр треугольника с заданными сторонами
-            Triangle triangle = new Triangle(3, 4, 5); // Пример значений для сторон a, b и c
+            DataGridView dataGridView = new DataGridView
+            {
+                ColumnCount = 2,
+                ReadOnly = true,
+                AllowUserToAddRows = false,
+                RowHeadersVisible = false,
+                ColumnHeadersVisible = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells,
+                ScrollBars = ScrollBars.None,
+                Size = new Size(400, 250),
+                Location = new Point(10, 10)
+            };
 
-            // Открываем форму TriangleForm и передаем туда объект треугольника
-            TriangleForm triangleForm = new TriangleForm(triangle);
-            triangleForm.Show();
+            dataGridView.Columns[0].Name = "Поле";
+            dataGridView.Columns[1].Name = "Значение";
+            dataGridView.DefaultCellStyle.Padding = new Padding(5);
+
+            DataGridViewCellStyle headerStyle = new DataGridViewCellStyle
+            {
+                Font = new Font("Arial", 10, FontStyle.Bold),
+                ForeColor = Color.Black,
+                BackColor = Color.LightGray,
+                Alignment = DataGridViewContentAlignment.MiddleCenter
+            };
+            dataGridView.ColumnHeadersDefaultCellStyle = headerStyle;
+            dataGridView.ColumnHeadersHeight = 40;
+
+            dataGridView.Rows.Add("Сторона a", " ");
+            dataGridView.Rows.Add("Сторона b", " ");
+            dataGridView.Rows.Add("Сторона c", " ");
+            dataGridView.Rows.Add("Периметр", " ");
+            dataGridView.Rows.Add("Площадь", " ");
+            dataGridView.Rows.Add("Существует?", " ");
+            dataGridView.Rows.Add("Спецификатор", "");
+
+            Controls.Add(dataGridView);
+        }
+
+        private void Side()
+        {
+            Label labelA = new Label
+            {
+                Text = "Сторона A:",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                ForeColor = Color.Blue,
+                Location = new Point(10, 270),
+                AutoSize = true
+            };
+            Controls.Add(labelA);
+
+            TextBox textBoxA = new TextBox
+            {
+                Name = "textBoxA",
+                Font = new Font("Arial", 12, FontStyle.Regular),
+                Location = new Point(150, 270),
+                Size = new Size(100, 30)
+            };
+            Controls.Add(textBoxA);
+
+            Label labelB = new Label
+            {
+                Text = "Сторона B:",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                ForeColor = Color.Blue,
+                Location = new Point(10, 310),
+                AutoSize = true
+            };
+            Controls.Add(labelB);
+
+            TextBox textBoxB = new TextBox
+            {
+                Name = "textBoxB",
+                Font = new Font("Arial", 12, FontStyle.Regular),
+                Location = new Point(150, 310),
+                Size = new Size(100, 30)
+            };
+            Controls.Add(textBoxB);
+
+            Label labelC = new Label
+            {
+                Text = "Сторона C:",
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                ForeColor = Color.Blue,
+                Location = new Point(10, 350),
+                AutoSize = true
+            };
+            Controls.Add(labelC);
+
+            TextBox textBoxC = new TextBox
+            {
+                Name = "textBoxC",
+                Font = new Font("Arial", 12, FontStyle.Regular),
+                Location = new Point(150, 350),
+                Size = new Size(100, 30)
+            };
+            Controls.Add(textBoxC);
+        }
+
+        private void StartButton_Click(object? sender, EventArgs e)
+        {
+            double a, b, c;
+
+            if (double.TryParse(Controls["textBoxA"].Text, out a) &&
+                double.TryParse(Controls["textBoxB"].Text, out b) &&
+                double.TryParse(Controls["textBoxC"].Text, out c))
+            {
+                triangle = new Triangle(a, b, c);
+
+                DataGridView dataGridView = Controls.OfType<DataGridView>().FirstOrDefault();
+                if (dataGridView != null)
+                {
+                    dataGridView.Rows.Clear();
+                    dataGridView.Rows.Add("Сторона a", triangle.GetSetA);
+                    dataGridView.Rows.Add("Сторона b", triangle.GetSetB);
+                    dataGridView.Rows.Add("Сторона c", triangle.GetSetC);
+                    dataGridView.Rows.Add("Периметр", triangle.Perimeter());
+                    dataGridView.Rows.Add("Площадь", triangle.Area());
+                    dataGridView.Rows.Add("Существует?", triangle.ExistTriangle ? "Существует" : "Не существует");
+                    dataGridView.Rows.Add("Спецификатор", triangle.TriangleType);
+                }
+
+                // Display appropriate image based on triangle type
+                SetTriangleImage(triangle.TriangleType);
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, введите корректные значения для сторон треугольника.");
+            }
+        }
+
+        private void SetTriangleImage(string triangleType)
+        {
+            string imagePath = triangleType switch
+            {
+                "Равносторонний" => "Erikülgne.png",
+                "Равнобедренный" => "Võrdhaarane.png",
+                "Разносторонний" => "Võrgkülgne.png",
+                "Прямоугольный" => "Teravnurkne.png",
+                "Остроугольный" => "Täisnurkne.png",
+                "Тупоугольный" => "Nürinurkne.png",
+                _ => "default.png" // Placeholder image
+            };
+
+            // Construct the full path correctly
+            string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, imagePath);
+
+            if (File.Exists(fullPath))
+            {
+                trianglePictureBox.Image = Image.FromFile(fullPath);
+            }
+            else
+            {
+                MessageBox.Show($"Файл изображения не найден: {fullPath}");
+            }
         }
     }
 }
